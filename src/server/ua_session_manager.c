@@ -25,7 +25,7 @@ void UA_SessionManager_deleteMembers(UA_SessionManager *sm) {
 static void
 removeSessionEntry(UA_SessionManager *sm, session_list_entry *sentry) {
     LIST_REMOVE(sentry, pointers);
-    UA_atomic_add(&sm->currentSessionCount, (UA_UInt32)-1);
+    UA_atomic_add32(&sm->currentSessionCount, (UA_UInt32)-1);
     UA_Session_deleteMembersCleanup(&sentry->session, sm->server);
 #ifndef UA_ENABLE_MULTITHREADING
     UA_free(sentry);
@@ -77,7 +77,7 @@ UA_SessionManager_createSession(UA_SessionManager *sm, UA_SecureChannel *channel
     if(!newentry)
         return UA_STATUSCODE_BADOUTOFMEMORY;
 
-    UA_atomic_add(&sm->currentSessionCount, 1);
+    UA_atomic_add32(&sm->currentSessionCount, 1);
     UA_Session_init(&newentry->session);
     newentry->session.sessionId = UA_NODEID_GUID(1, UA_Guid_random());
     newentry->session.authenticationToken = UA_NODEID_GUID(1, UA_Guid_random());

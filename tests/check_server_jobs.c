@@ -30,7 +30,7 @@ dummyJob(UA_Server *serverPtr, void *data) {
 
 START_TEST(Server_addRemoveRepeatedJob) {
     executed = UA_Boolean_new();
-    UA_Guid id;
+    UA_UInt64 id;
     UA_Job rj = (UA_Job){
         .type = UA_JOBTYPE_METHODCALL,
         .job.methodCall = {.data = NULL, .method = dummyJob}
@@ -52,7 +52,7 @@ START_TEST(Server_addRemoveRepeatedJob) {
 }
 END_TEST
 
-UA_Guid *jobId;
+UA_UInt64 *jobId;
 
 static void
 removeItselfJob(UA_Server *serverPtr, void *data) {
@@ -60,7 +60,7 @@ removeItselfJob(UA_Server *serverPtr, void *data) {
 }
 
 START_TEST(Server_repeatedJobRemoveItself) {
-    jobId = UA_Guid_new();
+    jobId = UA_UInt64_new();
     UA_Job rj = (UA_Job){
         .type = UA_JOBTYPE_METHODCALL,
         .job.methodCall = {.data = NULL, .method = removeItselfJob}
@@ -70,7 +70,7 @@ START_TEST(Server_repeatedJobRemoveItself) {
     usleep(15*1000);
     UA_Server_run_iterate(server, false);
 
-    UA_Guid_delete(jobId);
+    UA_UInt64_delete(jobId);
 }
 END_TEST
 

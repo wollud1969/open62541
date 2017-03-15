@@ -26,6 +26,9 @@ typedef struct {
     /* The callback to process jobs that have timed out */
     UA_RepeatedJobsListProcessCallback processCallback;
     void *processContext;
+
+    /* Counter to generate unique ids for the repeated jobs */
+    UA_UInt64 generatedJobsCount;
 } UA_RepeatedJobsList;
 
 void
@@ -35,10 +38,10 @@ UA_RepeatedJobsList_init(UA_RepeatedJobsList *rjl,
 
 UA_StatusCode
 UA_RepeatedJobsList_addRepeatedJob(UA_RepeatedJobsList *rjl, const UA_Job job,
-                                   const UA_UInt32 interval, UA_Guid *jobId);
+                                   const UA_UInt32 interval, UA_UInt64 *jobId);
 
 UA_StatusCode
-UA_RepeatedJobsList_removeRepeatedJob(UA_RepeatedJobsList *rjl, const UA_Guid jobId);
+UA_RepeatedJobsList_removeRepeatedJob(UA_RepeatedJobsList *rjl, UA_UInt64 jobId);
 
 /* Process the repeated jobs that have timed out.
  * Returns the timestamp of the next scheduled repeated job. */

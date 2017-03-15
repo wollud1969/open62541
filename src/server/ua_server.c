@@ -1594,11 +1594,11 @@ UA_Server_unregister_discovery(UA_Server *server, const char* discoveryServerUrl
 
 UA_StatusCode
 UA_Server_addRepeatedJob(UA_Server *server, UA_Job job,
-                         UA_UInt32 interval, UA_Guid *jobId) {
+                         UA_UInt32 interval, UA_UInt64 *jobId) {
     return UA_RepeatedJobsList_addRepeatedJob(&server->repeatedJobs, job, interval, jobId);
 }
 
 UA_StatusCode
-UA_Server_removeRepeatedJob(UA_Server *server, UA_Guid jobId) {
+UA_Server_removeRepeatedJob(UA_Server *server, UA_UInt64 jobId) {
     return UA_RepeatedJobsList_removeRepeatedJob(&server->repeatedJobs, jobId);
 }

@@ -555,7 +555,7 @@ void UA_Discovery_cleanupTimedOut(UA_Server *server, UA_DateTime nowMonotonic) {
 
 struct PeriodicServerRegisterJob {
     UA_UInt32 default_interval;
-    UA_Guid job_id;
+    UA_UInt64 job_id;
     UA_Job *job;
     UA_UInt32 this_interval;
     const char* discovery_server_url;
@@ -647,7 +647,7 @@ UA_Server_addPeriodicServerRegisterJob(UA_Server *server,
                                        const char* discoveryServerUrl,
                                        const UA_UInt32 intervalMs,
                                        const UA_UInt32 delayFirstRegisterMs,
-                                       UA_Guid* periodicJobId) {
+                                       UA_UInt64* periodicJobId) {
     if(server->periodicServerRegisterJob != NULL)
         return UA_STATUSCODE_BADINTERNALERROR;
 
@@ -677,7 +677,7 @@ UA_Server_addPeriodicServerRegisterJob(UA_Server *server,
     }
 
     if(periodicJobId)
-        UA_Guid_copy(&server->periodicServerRegisterJob->job_id, periodicJobId);
+        *periodicJobId = server->periodicServerRegisterJob->job_id;
 
     if(delayFirstRegisterMs > 0) {
         // Register the server with the discovery server.

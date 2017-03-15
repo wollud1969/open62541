@@ -260,7 +260,7 @@ UA_StatusCode UA_EXPORT UA_Server_run_shutdown(UA_Server *server);
  *         An error code otherwise. */
 UA_StatusCode UA_EXPORT
 UA_Server_addRepeatedJob(UA_Server *server, UA_Job job,
-                         UA_UInt32 interval, UA_Guid *jobId);
+                         UA_UInt32 interval, UA_UInt64 *jobId);
 
 /* Remove repeated job.
  *
@@ -269,7 +269,7 @@ UA_Server_addRepeatedJob(UA_Server *server, UA_Job job,
  * @return Upon sucess, UA_STATUSCODE_GOOD is returned.
  *         An error code otherwise. */
 UA_StatusCode UA_EXPORT
-UA_Server_removeRepeatedJob(UA_Server *server, UA_Guid jobId);
+UA_Server_removeRepeatedJob(UA_Server *server, UA_UInt64 jobId);
 
 /**
  * Reading and Writing Node Attributes
@@ -650,7 +650,9 @@ UA_Server_forEachChildNodeCall(UA_Server *server, UA_NodeId parentNodeId,
   * @param periodicJobId
   */
  UA_StatusCode UA_EXPORT
-         UA_Server_addPeriodicServerRegisterJob(UA_Server *server, const char* discoveryServerUrl, const UA_UInt32 intervalMs, const UA_UInt32 delayFirstRegisterMs, UA_Guid* periodicJobId);
+UA_Server_addPeriodicServerRegisterJob(UA_Server *server, const char* discoveryServerUrl,
+                                       const UA_UInt32 intervalMs, const UA_UInt32 delayFirstRegisterMs,
+                                       UA_UInt64* periodicJobId);
 
  /* Callback for RegisterServer. Data is passed from the register call */
  typedef void (*UA_Server_registerServerCallback)(const UA_RegisteredServer *registeredServer, void* data);
@@ -664,9 +666,7 @@ UA_Server_forEachChildNodeCall(UA_Server *server, UA_NodeId parentNodeId,
  * @return UA_STATUSCODE_SUCCESS on success
  */
 void UA_EXPORT
-         UA_Server_setRegisterServerCallback(UA_Server *server,
-                                             UA_Server_registerServerCallback cb,
-                                             void* data);
+UA_Server_setRegisterServerCallback(UA_Server *server, UA_Server_registerServerCallback cb, void* data);
 
 #ifdef UA_ENABLE_DISCOVERY_MULTICAST
 
@@ -675,7 +675,8 @@ void UA_EXPORT
  * @param isServerAnnounce indicates if the server has just been detected. If set to false, this means the server is shutting down.
  * @param isTxtReceived indicates if we already received the corresponding TXT record with the path and caps data
  **/
-typedef void (*UA_Server_serverOnNetworkCallback)(const UA_ServerOnNetwork *serverOnNetwork, UA_Boolean isServerAnnounce, UA_Boolean isTxtReceived, void* data);
+typedef void (*UA_Server_serverOnNetworkCallback)(const UA_ServerOnNetwork *serverOnNetwork,
+                                                  UA_Boolean isServerAnnounce, UA_Boolean isTxtReceived, void* data);
 
 /**
  * Set the callback which is called if another server is found through mDNS or deleted.
@@ -688,9 +689,9 @@ typedef void (*UA_Server_serverOnNetworkCallback)(const UA_ServerOnNetwork *serv
  * @return UA_STATUSCODE_SUCCESS on success
  */
 void UA_EXPORT
-        UA_Server_setServerOnNetworkCallback(UA_Server *server,
-                                             UA_Server_serverOnNetworkCallback cb,
-                                             void* data);
+UA_Server_setServerOnNetworkCallback(UA_Server *server,
+                                     UA_Server_serverOnNetworkCallback cb,
+                                     void* data);
 #endif
 
 #endif

@@ -91,7 +91,7 @@ UA_Boolean *running_register;
 UA_ServerNetworkLayer nl_register;
 pthread_t server_thread_register;
 
-UA_Guid periodicRegisterJobId;
+UA_UInt64 periodicRegisterJobId;
 
 static void * serverloop_register(void *_) {
     while(*running_register)

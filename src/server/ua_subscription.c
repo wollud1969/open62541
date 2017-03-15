@@ -27,7 +27,7 @@ UA_MonitoredItem * UA_MonitoredItem_new() {
     TAILQ_INIT(&newItem->queue);
     UA_NodeId_init(&newItem->monitoredNodeId);
     newItem->lastSampledValue = UA_BYTESTRING_NULL;
-    memset(&newItem->sampleJobGuid, 0, sizeof(UA_Guid));
+    newItem->sampleJobId = 0;
     newItem->sampleJobIsRegistered = false;
     newItem->itemId = 0;
     return newItem;
@@ -239,7 +239,7 @@ MonitoredItem_registerSampleJob(UA_Server *server, UA_MonitoredItem *mon) {
     job.job.methodCall.data = mon;
     UA_StatusCode retval = UA_Server_addRepeatedJob(server, job,
                                                     (UA_UInt32)mon->samplingInterval,
-                                                    &mon->sampleJobGuid);
+                                                    &mon->sampleJobId);
     if(retval == UA_STATUSCODE_GOOD)
         mon->sampleJobIsRegistered = true;
     return retval;
@@ -249,7 +249,7 @@ UA_StatusCode MonitoredItem_unregisterSampleJob(UA_Server *server, UA_MonitoredI
     if(!mon->sampleJobIsRegistered)
         return UA_STATUSCODE_GOOD;
     mon->sampleJobIsRegistered = false;
-    return UA_Server_removeRepeatedJob(server, mon->sampleJobGuid);
+    return UA_Server_removeRepeatedJob(server, mon->sampleJobId);
 }
 
 /****************/
@@ -265,7 +265,7 @@ UA_Subscription * UA_Subscription_new(UA_Session *session, UA_UInt32 subscriptio
     newItem->sequenceNumber = 0;
     newItem->maxKeepAliveCount = 0;
     newItem->publishingEnabled = false;
-    memset(&newItem->publishJobGuid, 0, sizeof(UA_Guid));
+    newItem->publishJobId = 0;
     newItem->publishJobIsRegistered = false;
     newItem->currentKeepAliveCount = 0;
     newItem->currentLifetimeCount = 0;
@@ -566,7 +566,7 @@ Subscription_registerPublishJob(UA_Server *server, UA_Subscription *sub) {
     job.job.methodCall.data = sub;
     UA_StatusCode retval =
         UA_Server_addRepeatedJob(server, job, (UA_UInt32)sub->publishingInterval,
-                                 &sub->publishJobGuid);
+                                 &sub->publishJobId);
     if(retval == UA_STATUSCODE_GOOD)
         sub->publishJobIsRegistered = true;
     return retval;
@@ -580,7 +580,7 @@ Subscription_unregisterPublishJob(UA_Server *server, UA_Subscription *sub) {
                          "Subscription %u | Unregister subscription publishing callback",
                          sub->subscriptionID);
     sub->publishJobIsRegistered = false;
-    return UA_Server_removeRepeatedJob(server, sub->publishJobGuid);
+    return UA_Server_removeRepeatedJob(server, sub->publishJobId);
 }
 
 /* When the session has publish requests stored but the last subscription is

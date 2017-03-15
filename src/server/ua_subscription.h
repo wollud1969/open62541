@@ -48,7 +48,7 @@ typedef struct UA_MonitoredItem {
     UA_DataChangeTrigger trigger;
 
     /* Sample Job */
-    UA_Guid sampleJobGuid;
+    UA_UInt64 sampleJobId;
     UA_Boolean sampleJobIsRegistered;
 
     /* Sample Queue */
@@ -101,7 +101,7 @@ struct UA_Subscription {
     UA_UInt32 lastMonitoredItemId;
 
     /* Publish Job */
-    UA_Guid publishJobGuid;
+    UA_UInt64 publishJobId;
     UA_Boolean publishJobIsRegistered;
 
     /* MonitoredItems */

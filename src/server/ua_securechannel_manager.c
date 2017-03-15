@@ -30,7 +30,7 @@ void UA_SecureChannelManager_deleteMembers(UA_SecureChannelManager *cm) {
 
 static void removeSecureChannel(UA_SecureChannelManager *cm, channel_list_entry *entry){
     LIST_REMOVE(entry, pointers);
-    UA_atomic_add(&cm->currentChannelCount, (UA_UInt32)-1);
+    UA_atomic_add32(&cm->currentChannelCount, (UA_UInt32)-1);
     UA_SecureChannel_deleteMembersCleanup(&entry->channel);
 #ifndef UA_ENABLE_MULTITHREADING
     UA_free(entry);
@@ -111,7 +111,7 @@ UA_SecureChannelManager_open(UA_SecureChannelManager *cm, UA_Connection *conn,
     /* Set all the pointers internally */
     UA_Connection_attachSecureChannel(conn, &entry->channel);
     LIST_INSERT_HEAD(&cm->channels, entry, pointers);
-    UA_atomic_add(&cm->currentChannelCount, 1);
+    UA_atomic_add32(&cm->currentChannelCount, 1);
     return UA_STATUSCODE_GOOD;
 }
 

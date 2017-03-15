@@ -94,7 +94,21 @@ UA_atomic_cmpxchg(void * volatile * addr, void *expected, void *newptr) {
 }
 
 static UA_INLINE uint32_t
-UA_atomic_add(volatile uint32_t *addr, uint32_t increase) {
+UA_atomic_add32(volatile uint32_t *addr, uint32_t increase) {
+#ifndef UA_ENABLE_MULTITHREADING
+    *addr += increase;
+    return *addr;
+#else
+# ifdef _MSC_VER /* Visual Studio */
+    return _InterlockedExchangeAdd(addr, increase) + increase;
+# else /* GCC/Clang */
+    return __sync_add_and_fetch(addr, increase);
+# endif
+#endif
+}
+
+static UA_INLINE uint64_t
+UA_atomic_add64(volatile uint64_t *addr, uint64_t increase) {
 #ifndef UA_ENABLE_MULTITHREADING
     *addr += increase;
     return *addr;

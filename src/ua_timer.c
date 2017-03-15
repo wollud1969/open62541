@@ -25,7 +25,7 @@ struct UA_RepeatedJob {
     SLIST_ENTRY(UA_RepeatedJob) next; /* Next element in the list */
     UA_DateTime nextTime;             /* The next time when the jobs are to be executed */
     UA_UInt64 interval;               /* Interval in 100ns resolution */
-    UA_Guid id;                       /* Id of the repeated job */
+    UA_UInt64 id;                     /* Id of the repeated job */
     UA_Job job;                       /* The job description itself */
 };
 
@@ -37,11 +37,12 @@ UA_RepeatedJobsList_init(UA_RepeatedJobsList *rjl,
     SLIST_INIT(&rjl->addRemoveJobs);
     rjl->processCallback = processCallback;
     rjl->processContext = processContext;
+    rjl->generatedJobsCount = 0;
 }
 
 UA_StatusCode
 UA_RepeatedJobsList_addRepeatedJob(UA_RepeatedJobsList *rjl, const UA_Job job,
-                                   const UA_UInt32 interval, UA_Guid *jobId) {
+                                   const UA_UInt32 interval, UA_UInt64 *jobId) {
     /* The interval needs to be at least 5ms */
     if(interval < 5)
         return UA_STATUSCODE_BADINTERNALERROR;
@@ -53,7 +54,7 @@ UA_RepeatedJobsList_addRepeatedJob(UA_RepeatedJobsList *rjl, const UA_Job job,
 
     /* Set the repeated job */
     rj->interval = (UA_UInt64)interval * (UA_UInt64)UA_MSEC_TO_DATETIME;
-    rj->id = UA_Guid_random();
+    rj->id = UA_atomic_add64(&rjl->generatedJobsCount, 1);
     rj->job = job;
     rj->nextTime = UA_DateTime_nowMonotonic() + (UA_DateTime)rj->interval;
 
@@ -72,7 +73,7 @@ UA_RepeatedJobsList_addRepeatedJob(UA_RepeatedJobsList *rjl, const UA_Job job,
 }
 
 UA_StatusCode
-UA_RepeatedJobsList_removeRepeatedJob(UA_RepeatedJobsList *rjl, const UA_Guid jobId) {
+UA_RepeatedJobsList_removeRepeatedJob(UA_RepeatedJobsList *rjl, UA_UInt64 jobId) {
     /* Allocate the repeated job structure */
     UA_RepeatedJob *rj = (UA_RepeatedJob*)UA_malloc(sizeof(UA_RepeatedJob));
     if(!rj)
@@ -124,10 +125,10 @@ insertRepeatedJob(UA_RepeatedJobsList *rjl,
 }
 
 static void
-removeRepeatedJob(UA_RepeatedJobsList *rjl, const UA_Guid *jobId) {
+removeRepeatedJob(UA_RepeatedJobsList *rjl, UA_UInt64 jobId) {
     UA_RepeatedJob *rj, *prev = NULL;
     SLIST_FOREACH(rj, &rjl->repeatedJobs, next) {
-        if(UA_Guid_equal(jobId, &rj->id)) {
+        if(jobId == rj->id) {
             if(prev)
                 SLIST_REMOVE_AFTER(prev, next);
             else
@@ -147,7 +148,7 @@ processAddRemoveJobs(UA_RepeatedJobsList *rjl, UA_DateTime nowMonotonic) {
         if(current->nextTime < UA_INT64_MAX) {
             insertRepeatedJob(rjl, current, nowMonotonic);
         } else {
-            removeRepeatedJob(rjl, &current->id);
+            removeRepeatedJob(rjl, current->id);
             UA_free(current);
         }
     }
