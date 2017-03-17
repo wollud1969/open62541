@@ -173,8 +173,7 @@ UA_RepeatedJobsList_process(UA_RepeatedJobsList *rjl,
     if(!lastNow) {
         if(firstAfter)
             return firstAfter->nextTime;
-        else
-            return UA_INT64_MAX;
+        return UA_INT64_MAX;
     }
 
     /* Put the jobs that are executed now in a separate list */
@@ -246,6 +245,10 @@ UA_RepeatedJobsList_deleteMembers(UA_RepeatedJobsList *rjl) {
     UA_RepeatedJob *current;
     while((current = SLIST_FIRST(&rjl->repeatedJobs))) {
         SLIST_REMOVE_HEAD(&rjl->repeatedJobs, next);
+        UA_free(current);
+    }
+    while((current = SLIST_FIRST(&rjl->addRemoveJobs))) {
+        SLIST_REMOVE_HEAD(&rjl->addRemoveJobs, next);
         UA_free(current);
     }
 }
